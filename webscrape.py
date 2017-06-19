@@ -13,8 +13,8 @@ def createSoup(player):
 	return BeautifulSoup(page.content, 'html.parser')
 
 
-# Returns the overall player stats for a specific mode('qp' or 'comp').
-def get_overall_stats(player, mode):
+# Returns the overall player stats value for a specific mode('qp' or 'comp').
+def get_overall_stats_value(player, mode):
 	# Checks for valid player argument
 	if player is None:
 		print('Not a valid player name.')
@@ -46,7 +46,16 @@ def get_overall_stats_label():
 	return stats[:int(len(stats) / 2)]
 
 
+# Returns the overall player stats for a specific mode.
+def get_overall_stats(player, mode):
+	all_label = get_overall_stats_label()
+	all_stat = get_overall_stats_value(player, mode)
+	return dict(zip(all_label, all_stat))
+
+
 # Returns the player stats for specific heros in an array form.
+# Return format: array of dictionaries with keys being string name of stat
+#	and value being string of the stat value.
 def get_hero_stats(player, mode):
 	soup = createSoup(player)
 
@@ -71,5 +80,22 @@ def get_hero_stats(player, mode):
 				n = n + 2
 			if stats_dict:
 				stats_array.append(stats_dict)
-	print(len(stats_array))
+	
+	return stats_array
 
+
+qp_hero = None
+cp_hero = None
+qp_over = None
+cp_over = None
+
+# Creates the dictionaries for the character stats.
+def get_all_stats(player):
+	global qp_hero, cp_hero, qp_over, cp_over
+	qp_hero = get_hero_stats(player, 'qp')
+	cp_hero = get_hero_stats(player, 'comp')
+	qp_over = get_overall_stats(player, 'qp')
+	cp_over = get_overall_stats(player, 'comp')
+
+get_all_stats(my_ign)
+print(qp_over)
