@@ -7,9 +7,14 @@ url = 'https://playoverwatch.com/en-us/career/pc/us/'
 my_ign = 'tannooby-11963'
 
 
+# Returns the page request from url.
+def request_page(site_url):
+	return requests.get(site_url)
+
+
 # Returns BeautifulSoup object given a player's name.
-def createSoup(player):
-	page = requests.get(url + player)
+def create_soup(player):
+	page = request_page(url + player)
 	return BeautifulSoup(page.content, 'html.parser')
 
 
@@ -20,7 +25,7 @@ def get_overall_stats_value(player, mode):
 		print('Not a valid player name.')
 		return None
 
-	soup = createSoup(player)
+	soup = create_soup(player)
 	featured_stats = soup.find_all(class_='card-heading')
 	l = int(len(featured_stats) / 2)
 	stats = []
@@ -38,7 +43,7 @@ def get_overall_stats_value(player, mode):
 
 # Returns the label for the overall stats of a player.
 def get_overall_stats_label():
-	soup = createSoup(my_ign)
+	soup = create_soup(my_ign)
 	featured_stats = soup.find_all(class_='card-copy')
 	stats = []
 	for fs in featured_stats:
@@ -57,7 +62,7 @@ def get_overall_stats(player, mode):
 # Return format: array of dictionaries with keys being string name of stat
 #	and value being string of the stat value.
 def get_hero_stats(player, mode):
-	soup = createSoup(player)
+	soup = create_soup(player)
 
 	# Find the page for the game mode.
 	page = None
@@ -96,6 +101,3 @@ def get_all_stats(player):
 	cp_hero = get_hero_stats(player, 'comp')
 	qp_over = get_overall_stats(player, 'qp')
 	cp_over = get_overall_stats(player, 'comp')
-
-get_all_stats(my_ign)
-print(qp_over)
