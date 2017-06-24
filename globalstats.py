@@ -1,4 +1,4 @@
-import webscrape as ws
+import playerstats as ps
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
@@ -13,7 +13,7 @@ def get_leaderboard():
 
 	elem = browser.find_element_by_tag_name("body")
 
-	pagedowns = 100
+	pagedowns = 60
 	while pagedowns:
 		elem.send_keys(Keys.PAGE_DOWN)
 		time.sleep(1)
@@ -25,8 +25,9 @@ def get_leaderboard():
 	players = []
 	for p in links:
 		players.append(p['href'])
-
+	print(len(players))
 	return players
+get_leaderboard()
 
 
 # Returns the overview stats of all heroes for a specified mode.
@@ -42,7 +43,7 @@ def get_hero_overview(location, mode):
 	else:
 		return None
 
-	page = ws.request_page(url)
+	page = ps.request_page(url)
 	soup = BeautifulSoup(page.content, 'html.parser')
 
 	table = soup.find_all('div', class_='tab-pane')
@@ -79,7 +80,7 @@ def get_hero_combat(location, mode):
 	else:
 		return None
 
-	page = ws.request_page(url)
+	page = ps.request_page(url)
 	soup = BeautifulSoup(page.content, 'html.parser')
 
 	table = soup.find_all('div', class_='tab-pane')
@@ -105,3 +106,41 @@ def get_hero_combat(location, mode):
 	result = [hero_name, elim, death, damage, block, heal, acc]
 
 	return result
+
+
+# Returns the misc stats of all heroes for a specified mode.
+# Stats: obj time, obj kills, medals, cards
+# Locations: global, us, eu, kr, cn
+# Mode: qp, comp
+def get_hero_misc(location, mode):
+	url = 'https://masteroverwatch.com/heroes/pc/' + location + '/mode/'
+	if mode == 'qp':
+		url = url + 'quick'
+	elif mode == 'comp':
+		url = url + 'ranked'
+	else:
+		return None
+
+	page = ps.request_page(url)
+	soup = BeautifulSoup(page.content, 'html.parser')
+
+	table = soup.find_all('div', class_='tab-pane')
+	heroes = table[1].find('div', class_='table-body').find_all(class_='table-row row')
+	
+	hero_name = []
+	obj_time = []
+	obj_kill = []
+	medals = []
+	cards = []
+	for h in heroes:
+		hero_name.append(h.find('strong').getText())
+		t = h.find_all(class_='bar-outer')
+		obj_time.append(t[0].getText())
+		obj_kill.append(t[1].getText())
+		medals.append(t[2].getText())
+		cards.append(t[3].getText())
+
+	result = [hero_name, obj_time, obj_kill, medals, cards]
+
+	return result
+

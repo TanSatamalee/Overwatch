@@ -13,12 +13,15 @@ def request_page(site_url):
 
 
 # Returns BeautifulSoup object given a player's name.
+# Player: username-battlenetid
 def create_soup(player):
 	page = request_page(url + player)
 	return BeautifulSoup(page.content, 'html.parser')
 
 
-# Returns the overall player stats value for a specific mode('qp' or 'comp').
+# Returns the overall player stats value for a specific mode.
+# Player: username-battlenetid
+# Mode: qp, comp
 def get_overall_stats_value(player, mode):
 	# Checks for valid player argument
 	if player is None:
@@ -52,6 +55,8 @@ def get_overall_stats_label():
 
 
 # Returns the overall player stats for a specific mode.
+# Player: username-battlenetid
+# Mode: qp, comp
 def get_overall_stats(player, mode):
 	all_label = get_overall_stats_label()
 	all_stat = get_overall_stats_value(player, mode)
