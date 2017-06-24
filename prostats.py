@@ -26,7 +26,36 @@ def get_leaderboard():
 	for p in links:
 		players.append(p['href'])
 
-	print(len(players))
 	return players
 
-get_leaderboard()
+
+# Returns the popularity and winrate of all heroes for a specified mode.
+def get_hero_overview(mode):
+	url = 'https://masteroverwatch.com/heroes/pc/us/mode/'
+	if mode == 'qp':
+		url = url + 'quick'
+	elif mode == 'comp':
+		url = url + 'ranked'
+	else:
+		return None
+
+	page = ws.request_page(url)
+	soup = BeautifulSoup(page.content, 'html.parser')
+
+	table = soup.find_all('div', class_='tab-pane')
+	heroes = table[0].find('div', class_='table-body').find_all(class_='table-row row')
+	
+	hero_name = []
+	popularity = []
+	winrate = []
+	for h in heroes:
+		hero_name.append(h.find('strong').getText())
+		t = h.find_all(class_='bar-outer')
+		popularity.append(t[0].getText())
+		winrate.append(t[1].getText())
+
+	result = [hero_name, popularity, winrate]
+
+	return result
+
+get_hero_overview('qp')
