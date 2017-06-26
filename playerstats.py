@@ -8,14 +8,14 @@ my_ign = 'tannooby-11963'
 
 
 # Returns the page request from url.
-def request_page(site_url):
+def _request_page(site_url):
 	return requests.get(site_url)
 
 
 # Returns BeautifulSoup object given a player's name.
 # Player: username-battlenetid
-def create_soup(player):
-	page = request_page(url + player)
+def _create_soup(player):
+	page = _request_page(url + player)
 	return BeautifulSoup(page.content, 'html.parser')
 
 
@@ -28,7 +28,7 @@ def get_overall_stats_value(player, mode):
 		print('Not a valid player name.')
 		return None
 
-	soup = create_soup(player)
+	soup = _create_soup(player)
 	featured_stats = soup.find_all(class_='card-heading')
 	l = int(len(featured_stats) / 2)
 	stats = []
@@ -41,12 +41,13 @@ def get_overall_stats_value(player, mode):
 	else:
 		print('Not a valid mode.')
 		return None
+
 	return stats
 
 
 # Returns the label for the overall stats of a player.
 def get_overall_stats_label():
-	soup = create_soup(my_ign)
+	soup = _create_soup(my_ign)
 	featured_stats = soup.find_all(class_='card-copy')
 	stats = []
 	for fs in featured_stats:
@@ -60,14 +61,14 @@ def get_overall_stats_label():
 def get_overall_stats(player, mode):
 	all_label = get_overall_stats_label()
 	all_stat = get_overall_stats_value(player, mode)
-	return dict(zip(all_label, all_stat))
+	return [all_label, all_stat]
 
 
 # Returns the player stats for specific heros in an array form.
 # Return format: array of dictionaries with keys being string name of stat
 #	and value being string of the stat value.
 def get_hero_stats(player, mode):
-	soup = create_soup(player)
+	soup = _create_soup(player)
 
 	# Find the page for the game mode.
 	page = None

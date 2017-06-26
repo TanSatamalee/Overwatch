@@ -25,9 +25,8 @@ def get_leaderboard():
 	players = []
 	for p in links:
 		players.append(p['href'])
-	print(len(players))
+
 	return players
-get_leaderboard()
 
 
 # Returns the overview stats of all heroes for a specified mode.
@@ -43,7 +42,7 @@ def get_hero_overview(location, mode):
 	else:
 		return None
 
-	page = ps.request_page(url)
+	page = ps._request_page(url)
 	soup = BeautifulSoup(page.content, 'html.parser')
 
 	table = soup.find_all('div', class_='tab-pane')
@@ -66,7 +65,6 @@ def get_hero_overview(location, mode):
 
 	return result
 
-
 # Returns the combat stats of all heroes for a specified mode.
 # Stats: elims, deaths, damage, block, heals, accuracy
 # Locations: global, us, eu, kr, cn
@@ -80,7 +78,7 @@ def get_hero_combat(location, mode):
 	else:
 		return None
 
-	page = ps.request_page(url)
+	page = ps._request_page(url)
 	soup = BeautifulSoup(page.content, 'html.parser')
 
 	table = soup.find_all('div', class_='tab-pane')
@@ -121,7 +119,7 @@ def get_hero_misc(location, mode):
 	else:
 		return None
 
-	page = ps.request_page(url)
+	page = ps._request_page(url)
 	soup = BeautifulSoup(page.content, 'html.parser')
 
 	table = soup.find_all('div', class_='tab-pane')
@@ -144,3 +142,44 @@ def get_hero_misc(location, mode):
 
 	return result
 
+
+# Converts data string scraped from website to anfloat stat.
+def _convert(data):
+	data = data.replace(',','')
+	if data[-1] == '%':
+		return float(data[:-1])
+	elif len(data) > 1 and data[-2] == ':':
+		return float(data[:-2])
+	else:
+		return float(data)
+
+
+# Returns all global stats for all heroes for a specified mode and location.
+# Locations: global, us, eu, kr, cn
+# Mode: qp, comp
+def get_global_stats(location, mode):
+	overview = get_hero_overview(location, mode)
+	combat = get_hero_combat(location, mode)
+	misc = get_hero_misc(location, mode)
+
+	total = []
+	label = ['hero','popularity','winrate','kda','medals',\
+		'elims','deaths','damage','block','heal','accuracy'\
+		'obj time','obj kills','medals','cards']
+	total.append(label)
+	for i in range(len(overview[0])):
+		temp = []
+		for a in overview:
+			if temp:
+				temp.append(_convert(a[i]))
+			else:
+				temp.append(a[i])
+		for b in combat[1:]:
+			temp.append(_convert(b[i]))
+		for c in misc[1:]:
+			temp.append(_convert(c[i]))
+		total.append(temp)
+
+	return total
+
+print(get_global_stats('us','qp'))
