@@ -181,5 +181,3 @@ def get_global_stats(location, mode):
 		total.append(temp)
 
 	return total
-
-print(get_global_stats('us','qp'))
