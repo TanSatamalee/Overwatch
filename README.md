@@ -10,13 +10,13 @@ Gets data for specific players from *playoverwatch.com*.
 
 Gets the overall stats for a player in a specific mode.
 Arguments: player (username-battlenetid) && mode (qp, comp)
-Return: 2D array of value labels and values for a player
+Return: 2D array of value labels and values for a player. First row is the labels and second row is values. ** ALL VALUES ARE IN STRING **
 
 `get_hero_stats(player, mode)`
 
 Gets the overall stats for each hero for a specific player.
 Arguments: player (username-battlenetid) && mode (qp, comp)
-Return: 2D array of value labels followed by all values for each hero
+Return: 2D array of dictonaries of stats for each hero. ** STILL NEED HERO NAMES, ALL VALUES ARE IN STRING **
 
 
 ## globalstats.py
@@ -27,7 +27,7 @@ Gets global data for heroes, leaderboards, etc. from *masteroverwatch.com*
 
 Gets a list of all top 500 players with their battlenet ids.
 Arguments: none
-Return: array of 500 strings of username and battlenet ids of the current top 500 players
+Return: array of 500 strings of username and battlenet ids of the current top 500 players ** STILL NEED TO DEBUG UNCONVENTIONAL NAMES **
 
 `get_hero_overview(location, mode)`
 
@@ -46,3 +46,8 @@ Return: 2D array of hero name, elims, deaths, damage, block, heals, and accuracy
 Gets the combat stats for heroes.
 Arguments: location (global, us, eu, kr, cn) && mode (qp, comp)
 Return: 2D array of hero name, obj time, obj kills, medals, and cards for all heroes
+
+'get_global_stats(location, mode)'
+Gets the all stats for heroes.
+Arguments: location (global, us, eu, kr, cn) && mode (qp, comp)
+Return: 2D array of all hero stats. First row is all the labels for the column values. The following rows start with the hero name and then the values for the corrsponding stats.
