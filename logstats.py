@@ -20,15 +20,15 @@ def store_global_stats():
             conn = sqlite3.connect(m + '/' + prefix + 'globalstats.db')
 
             create_table = '''CREATE TABLE IF NOT EXISTS globalstats 
-                (date TEXT, hero TEXT'''
+                (key TEXT PRIMARY KEY, date TEXT, hero TEXT'''
             for label in data[0][1:]:
                 create_table += ', ' + label + ' REAL'
             create_table += ');'
             conn.execute(create_table)
 
-            insert_table = 'INSERT INTO globalstats VALUES(' + date
+            insert_table = 'INSERT INTO globalstats VALUES(\'' + date
             for d in data[1:]:
-                temp = insert_table
+                temp = insert_table + d[0] + '\', ' + date
                 d[0] = '\'' + d[0] + '\''
                 for v in d:
                     temp +=  ', ' + str(v)
@@ -36,6 +36,7 @@ def store_global_stats():
 
             conn.commit()
             conn.close()
+
 
 # Prints the column names for a table conn.
 def _get_table_column_keys(conn):
@@ -50,4 +51,3 @@ def _print_database(name):
     cur.execute('SELECT * FROM globalstats')
     for a in cur.fetchall():
         print(a)
-

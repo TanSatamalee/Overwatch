@@ -81,19 +81,26 @@ def get_hero_stats(player, mode):
         return None
 
     stats_array = []
+    hero_list = None
     for c in page.find_all():
-        if 'data-group-id' in c.attrs:
-            stats = c.find_all('td')
-            stats_dict = dict()
-            n = 0
-            while n < len(stats):
-                stats_dict[stats[n].contents[0]] = stats[n + 1].contents[0]
-                n = n + 2
-            if stats_dict:
-                stats_array.append(stats_dict)
+        if 'data-group-id' in c.attrs and c['data-group-id'] == 'stats':
+            if hero_list is None:
+                hero_list = c
+            else:
+                hero_id = c['data-category-id']
+                stats = c.find_all('td')
+                stats_dict = dict()
+                for hero in hero_list:
+                    if hero['value'] == hero_id:
+                        stats_dict['hero'] = hero.get_text()
+                n = 0
+                while n < len(stats):
+                    stats_dict[stats[n].contents[0]] = stats[n + 1].contents[0]
+                    n = n + 2
+                if stats_dict:
+                    stats_array.append(stats_dict)
     
     return stats_array
-
 
 qp_hero = None
 cp_hero = None

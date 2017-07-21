@@ -16,7 +16,7 @@ Return: 2D array of value labels and values for a player. First row is the label
 
 Gets the overall stats for each hero for a specific player.
 Arguments: player (username-battlenetid) && mode (qp, comp)
-Return: 2D array of dictonaries of stats for each hero. ** STILL NEED HERO NAMES, ALL VALUES ARE IN STRING **
+Return: 2D array of dictonaries of stats for each hero. ** ALL VALUES ARE IN STRING **
 
 
 ## globalstats.py
@@ -25,7 +25,7 @@ Gets global data for heroes, leaderboards, etc. from *masteroverwatch.com*
 
 `get_leaderboard()`
 
-Gets a list of all top 500 players with their battlenet ids.
+Gets a list of all top 500 players with their battlenet ids. (NOTE THAT THIS OPENS A CHROME BROWSER AND GOING TO MASTEROVERWATCH)
 Arguments: none
 Return: array of 500 strings of username and battlenet ids of the current top 500 players ** STILL NEED TO DEBUG UNCONVENTIONAL NAMES **
 
