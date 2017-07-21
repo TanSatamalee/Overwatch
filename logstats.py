@@ -8,7 +8,7 @@ locations = ['global','us','eu','kr','cn']
 modes = ['qp','comp']
 
 # Saves global hero stats for all locations and modes in files.
-# File naming: location_mode_date.txt
+# File naming: mode_location_globalstats.db
 def store_global_stats():
     now = datetime.datetime.now()
     date = str(now.month) + str(now.day) + str(now.year)
@@ -17,12 +17,12 @@ def store_global_stats():
         for m in modes:
             data = gs.get_global_stats(l, m)
             prefix = m + '_' + l + '_'
-            conn = sqlite3.connect(prefix + 'globalstats.db')
+            conn = sqlite3.connect(m + '/' + prefix + 'globalstats.db')
 
             create_table = '''CREATE TABLE IF NOT EXISTS globalstats 
                 (date TEXT, hero TEXT'''
-            for l in data[0][1:]:
-                create_table += ', ' + l + ' REAL'
+            for label in data[0][1:]:
+                create_table += ', ' + label + ' REAL'
             create_table += ');'
             conn.execute(create_table)
 
@@ -37,10 +37,17 @@ def store_global_stats():
             conn.commit()
             conn.close()
 
-store_global_stats()
-
-# For debugging. Prints the column names for a table conn.
+# Prints the column names for a table conn.
 def _get_table_column_keys(conn):
     cursor = conn.execute('select * from globalstats')
     names = list(map(lambda x: x[0], cursor.description))
     print(names)
+
+# Prints tables for specific database name.
+def _print_database(name):
+    conn = sqlite3.connect(name)
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM globalstats')
+    for a in cur.fetchall():
+        print(a)
+

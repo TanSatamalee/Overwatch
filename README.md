@@ -51,3 +51,10 @@ Return: 2D array of hero name, obj time, obj kills, medals, and cards for all he
 Gets the all stats for heroes.
 Arguments: location (global, us, eu, kr, cn) && mode (qp, comp)
 Return: 2D array of all hero stats. First row is all the labels for the column values. The following rows start with the hero name and then the values for the corrsponding stats.
+
+
+## logstats.py
+
+'store_global_stats()'
+Stores the global stats in a sqlite file for each region and game mode.
+Return: Creates a database for each region and game mode.
