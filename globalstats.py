@@ -166,8 +166,8 @@ def get_global_stats(location, mode):
 
     total = []
     label = ['hero','popularity','winrate','kda','medals',\
-        'elims','deaths','damage','block','heal','accuracy'\
-        'obj time','obj kills','medals','cards']
+        'elims','deaths','damage','block','heal','accuracy',\
+        'obj_time','obj_kills','cards']
     total.append(label)
     for i in range(min(len(overview[0]),len(overview[1]))):
         temp = []
@@ -179,7 +179,8 @@ def get_global_stats(location, mode):
         for b in combat[1:]:
             temp.append(_convert(b[i]))
         for c in misc[1:]:
-            temp.append(_convert(c[i]))
+            if not c == misc[3]:
+                temp.append(_convert(c[i]))
         total.append(temp)
 
     return total
