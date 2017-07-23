@@ -89,3 +89,9 @@ def store_player_stats(player, folder):
 
             conn.commit()
             conn.close()
+
+# Saves the current top 500 players into the file by adding any new additions.
+def store_leaderboard():
+    now = datetime.datetime.now()
+    date = str(now.month) + str(now.day) + str(now.year)
+    lb = get_leaderboard()

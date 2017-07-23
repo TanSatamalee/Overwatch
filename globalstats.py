@@ -24,7 +24,7 @@ def get_leaderboard():
 
     players = []
     for p in links:
-        players.append(p['href'])
+        players.append(p['href'].split('/')[-1])
 
     return players
 
