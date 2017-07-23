@@ -90,8 +90,36 @@ def store_player_stats(player, folder):
             conn.commit()
             conn.close()
 
-# Saves the current top 500 players into the file by adding any new additions.
+# Updates current top 500 players into databases.
+# Keeps track of all players who have made leaderboard and the current leaderboard.
 def store_leaderboard():
     now = datetime.datetime.now()
-    date = str(now.month) + str(now.day) + str(now.year)
-    lb = get_leaderboard()
+    date = '\'' + str(now.month) + str(now.day) + str(now.year) + '\''
+    conn = sqlite3.connect('top500/leaderboard.db')
+
+    create_table = '''CREATE TABLE IF NOT EXISTS total_lb 
+                (player TEXT PRIMARY KEY, date TEXT, amt INT)'''
+    conn.execute(create_table)
+
+    conn.execute('DROP TABLE IF EXISTS current_lb')
+    create_table2 = '''CREATE TABLE IF NOT EXISTS current_lb 
+                (player TEXT)'''
+    conn.execute(create_table2)
+
+    cursor = conn.cursor()
+    lb = gs.get_leaderboard()
+    for p in lb:
+        ign = '\'' + p  + '\''
+        cursor.execute('SELECT player FROM total_lb WHERE player = ' + ign)
+        n = cursor.fetchone()
+        if n is None:
+            conn.execute('INSERT INTO total_lb VALUES(' + ign + ', ' + date + ', 1)')
+        else:
+            cur = conn.execute('SELECT amt FROM total_lb WHERE player = ' + ign)
+            for row in cur:
+                x = row[0] + 1
+            conn.execute('UPDATE total_lb SET amt = ' + str(x) + ' WHERE player = ' + ign)
+        conn.execute('INSERT INTO current_lb VALUES(' + ign + ')')
+
+
+store_leaderboard()

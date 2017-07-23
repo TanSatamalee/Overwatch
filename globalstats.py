@@ -1,13 +1,11 @@
 import playerstats as ps
 import json
 import urllib
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 import time
 from bs4 import BeautifulSoup
 
 # Returns a list of the top 500 players with their id.
-def get_leaderboard2():
+def get_leaderboard():
     # Getting the top 50 players
     url = 'https://masteroverwatch.com/leaderboards/pc/global'
     page = ps._request_page(url)
