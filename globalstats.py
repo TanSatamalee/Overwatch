@@ -1,30 +1,34 @@
 import playerstats as ps
+import json
+import urllib
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 from bs4 import BeautifulSoup
 
 # Returns a list of the top 500 players with their id.
-def get_leaderboard():
+def get_leaderboard2():
+    # Getting the top 50 players
     url = 'https://masteroverwatch.com/leaderboards/pc/global'
-    browser = webdriver.Chrome("C:/Games/chromedriver.exe")
-    browser.get(url)
-    time.sleep(1)
-
-    elem = browser.find_element_by_tag_name("body")
-
-    pagedowns = 60
-    while pagedowns:
-        elem.send_keys(Keys.PAGE_DOWN)
-        time.sleep(1)
-        pagedowns = pagedowns - 1
-
-    soup = BeautifulSoup(browser.page_source, 'html.parser')
+    page = ps._request_page(url)
+    soup = BeautifulSoup(page.content, 'html.parser')
     links = soup.find_all('a', {'class':'table-row-link'}, href=True)
 
     players = []
     for p in links:
         players.append(p['href'].split('/')[-1])
+
+    # Getting the other 450 players by JSON.
+    json_url = 'https://masteroverwatch.com/leaderboards/pc/global/mode/'
+    json_url += 'ranked/category/skillrating/hero/overall/role/overall/data?offset='
+    hdr = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0'}
+    for i in range(1, 10):
+        req = urllib.request.Request(json_url + str(i * 50), headers=hdr)
+        response = urllib.request.urlopen(req)
+        str_response = response.read().decode('utf-8')
+        data = json.loads(str_response)
+        for item in data.get('entries',[]):
+            players.append(item.split('href')[1].split('\"')[1].split('/')[-1])
 
     return players
 
