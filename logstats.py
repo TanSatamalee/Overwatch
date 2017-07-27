@@ -15,16 +15,17 @@ def _convert_string(s):
         return re.sub('[^0-9]+', '', s)
     return re.sub('[^0-9a-zA-Z]+', '', s)
 
-# Prints the column names for a table conn.
-def _get_table_column_keys(conn):
-    cursor = conn.execute('select * from globalstats')
+# Returns the column names for a table conn.
+def _get_table_column_keys(conn, table):
+    cursor = conn.execute('select * from ' + table)
     names = list(map(lambda x: x[0], cursor.description))
-    print(names)
+    return names
 
 # Prints tables for specific database name.
 def _print_database(name, table):
     conn = sqlite3.connect(name)
     cur = conn.cursor()
+    print(_get_table_column_keys(conn, table))
     cur.execute('SELECT * FROM ' + table)
     for a in cur.fetchall():
         print(a)
@@ -120,6 +121,5 @@ def store_leaderboard():
                 x = row[0] + 1
             conn.execute('UPDATE total_lb SET amt = ' + str(x) + ' WHERE player = ' + ign)
         conn.execute('INSERT INTO current_lb VALUES(' + ign + ')')
-
-
-store_leaderboard()
+    conn.commit()
+    conn.close()
