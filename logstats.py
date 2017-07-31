@@ -84,6 +84,8 @@ def store_player_stats(player, folder):
                 arr = old_arr
             else:
                 arr = pd.concat([old_arr,new_arr], axis=0, ignore_index=True)
+                if 'level_0' in arr:
+                    arr = arr.drop('level_0', axis=1)
             conn.execute('DROP TABLE IF EXISTS ' + hero)
             arr.to_sql(hero, conn)
 
