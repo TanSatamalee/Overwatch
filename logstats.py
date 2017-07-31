@@ -1,19 +1,13 @@
 import sqlite3
 import datetime
-import re
 import globalstats as gs
 import playerstats as ps
+import pandas as pd
 from pathlib import Path
 
 locations = ['global','us','eu','kr','cn']
 modes = ['qp','comp']
 
-
-# Gets rid of all non-alphanumeric characters of a string.
-def _convert_string(s):
-    if str.isdigit(s[0]):
-        return re.sub('[^0-9]+', '', s)
-    return re.sub('[^0-9a-zA-Z]+', '', s)
 
 # Returns the column names for a table conn.
 def _get_table_column_keys(conn, table):
@@ -71,22 +65,27 @@ def store_player_stats(player, folder):
     for m in modes:
         data = ps.get_hero_stats(player, m)
         for d in data:
-            hero = _convert_string(d['hero'])
-            conn = sqlite3.connect(folder + '/' + m + '_playerstats.db')
+            hero = d['hero']
+            conn = sqlite3.connect(folder + '/' + player + '_' + m + '_playerstats.db')
 
             create_table = 'CREATE TABLE IF NOT EXISTS ' + hero \
                 + ' (date TEXT PRIMARY KEY'
             for label in d:
                 if not label == 'hero':
-                    create_table += ', ' + _convert_string(label) + ' REAL'
+                    create_table += ', ' + label + ' REAL'
             create_table += ');'
             conn.execute(create_table)
 
-            insert_table = 'INSERT INTO ' + hero + ' VALUES(\'' + date + '\''
-            for k, v in d.items():
-                if not k == 'hero':
-                    insert_table +=  ', ' + str(_convert_string(v))
-            conn.execute(insert_table + ' )')
+            d['date'] = date
+            del d['hero']
+            old_arr = pd.read_sql_query('SELECT * FROM ' + hero, conn)
+            new_arr = pd.DataFrame([d], columns=d.keys())
+            if any(old_arr.date == date):
+                arr = old_arr
+            else:
+                arr = pd.concat([old_arr,new_arr], axis=0, ignore_index=True)
+            conn.execute('DROP TABLE IF EXISTS ' + hero)
+            arr.to_sql(hero, conn)
 
             conn.commit()
             conn.close()

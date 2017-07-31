@@ -1,11 +1,18 @@
 import requests
 import locale
+import re
 from bs4 import BeautifulSoup
 
 url = 'https://playoverwatch.com/en-us/career/pc/us/'
 
 my_ign = 'tannooby-11963'
 
+
+# Gets rid of all non-alphanumeric characters of a string.
+def _convert_string(s):
+    if str.isdigit(s[0]):
+        return re.sub('[^0-9]+', '', s)
+    return re.sub('[^0-9a-zA-Z]+', '', s)
 
 # Returns the page request from url.
 def _request_page(site_url):
@@ -92,10 +99,10 @@ def get_hero_stats(player, mode):
                 stats_dict = dict()
                 for hero in hero_list:
                     if hero['value'] == hero_id:
-                        stats_dict['hero'] = hero.get_text()
+                        stats_dict['hero'] = _convert_string(hero.get_text())
                 n = 0
                 while n < len(stats):
-                    stats_dict[stats[n].contents[0]] = stats[n + 1].contents[0]
+                    stats_dict[_convert_string(stats[n].contents[0])] = _convert_string(stats[n + 1].contents[0])
                     n = n + 2
                 if stats_dict:
                     stats_array.append(stats_dict)
