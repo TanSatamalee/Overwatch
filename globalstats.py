@@ -4,10 +4,52 @@ import urllib
 import time
 from bs4 import BeautifulSoup
 
-# Returns a list of the top 500 players with their id.
-def get_leaderboard():
+heros = {
+    'roadhog':'1',
+    'junkrat':'2',
+    'lucio':'3',
+    'soldier':'4',
+    'zarya':'5',
+    'mcree':'6',
+    'tracer':'7',
+    'reaper':'8',
+    'widowmaker':'9',
+    'winston':'10',
+    'pharah':'11',
+    'reinhardt':'12',
+    'symmetra':'13',
+    'torbjrn':'14',
+    'bastion':'15',
+    'hanzo':'16',
+    'mercy':'17',
+    'zenyatta':'18',
+    #'':'19', NUMBER 19 DOENST EXIST ON MASTEROVERWATCH.COM
+    'mei':'20',
+    'genji':'21',
+    'dva':'22',
+    'ana':'23',
+    'sombra':'24',
+    'orisa':'25',
+    'doomfist':'26'
+}
+
+# Returns the top 500 players for a certain region (certain hero if provided).
+# Locations: global, us, eu, kr, cn
+def get_top500(location, hero=None):
+    if hero is None:
+        url = 'https://masteroverwatch.com/leaderboards/pc/' + location
+    else:
+        n = _get_hero_dict()[hero.lower()]
+        if n is None:
+            print('Hero does not exist')
+            return None
+        url = 'https://masteroverwatch.com/leaderboards/pc/' + location + \
+         '/hero/' + n + '/mode/ranked/category/averagescore'
+    return _get_leaderboard(url)
+
+# Returns a list of the leaderboard with their id according to the url.
+def _get_leaderboard(url):
     # Getting the top 50 players
-    url = 'https://masteroverwatch.com/leaderboards/pc/global'
     page = ps._request_page(url)
     soup = BeautifulSoup(page.content, 'html.parser')
     links = soup.find_all('a', {'class':'table-row-link'}, href=True)
@@ -29,6 +71,11 @@ def get_leaderboard():
             players.append(item.split('href')[1].split('\"')[1].split('/')[-1])
 
     return players
+
+# Returns the hero dictionary for corresponding number on masteroverwatch.com
+def _get_hero_dict():
+    global heros
+    return heros
 
 # Returns the overview stats of all heroes for a specified mode.
 # Stats: Popularity, Winrate, KDA, Medals

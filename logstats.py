@@ -92,12 +92,16 @@ def store_player_stats(player, folder):
             conn.commit()
             conn.close()
 
-# Updates current top 500 players into databases.
+# Updates current top 500 players into databases (for heroes if specified).
 # Keeps track of all players who have made leaderboard and the current leaderboard.
-def store_leaderboard():
+# Locations: global, us, eu, kr, cn
+def store_leaderboard(location, hero=None):
     now = datetime.datetime.now()
     date = '\'' + str(now.month) + str(now.day) + str(now.year) + '\''
-    conn = sqlite3.connect('top500/leaderboard.db')
+    if hero is None:
+        conn = sqlite3.connect('top500/' + location + '_leaderboard.db')
+    else:
+        conn = sqlite3.connect('top500/' + location + '_' + hero + '_leaderboard.db')
 
     create_table = '''CREATE TABLE IF NOT EXISTS total_lb 
                 (player TEXT PRIMARY KEY, date TEXT, amt INT)'''
@@ -109,7 +113,7 @@ def store_leaderboard():
     conn.execute(create_table2)
 
     cursor = conn.cursor()
-    lb = gs.get_leaderboard()
+    lb = gs.get_top500(location, hero)
     for p in lb:
         ign = '\'' + p  + '\''
         cursor.execute('SELECT player FROM total_lb WHERE player = ' + ign)
