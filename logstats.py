@@ -55,6 +55,7 @@ def store_global_stats():
             conn.commit()
             conn.close()
 
+
 # Saves player sats for all modes for a specific player.
 # Player: username-battlenetid
 # Folder: name of folder to put database file into.
@@ -92,6 +93,7 @@ def store_player_stats(player, folder):
             conn.commit()
             conn.close()
 
+
 # Updates current top 500 players into databases (for heroes if specified).
 # Keeps track of all players who have made leaderboard and the current leaderboard.
 # Locations: global, us, eu, kr, cn
@@ -104,27 +106,28 @@ def store_leaderboard(location, hero=None):
         conn = sqlite3.connect('top500/' + location + '_' + hero + '_leaderboard.db')
 
     create_table = '''CREATE TABLE IF NOT EXISTS total_lb 
-                (player TEXT PRIMARY KEY, date TEXT, amt INT)'''
+                (player TEXT PRIMARY KEY, region TEXT, date TEXT, amt INT)'''
     conn.execute(create_table)
 
     conn.execute('DROP TABLE IF EXISTS current_lb')
     create_table2 = '''CREATE TABLE IF NOT EXISTS current_lb 
-                (player TEXT)'''
+                (player TEXT, region TEXT)'''
     conn.execute(create_table2)
 
     cursor = conn.cursor()
     lb = gs.get_top500(location, hero)
     for p in lb:
-        ign = '\'' + p  + '\''
+        ign = '\'' + p[0]  + '\''
+        cty = '\'' + p[1]  + '\''
         cursor.execute('SELECT player FROM total_lb WHERE player = ' + ign)
         n = cursor.fetchone()
         if n is None:
-            conn.execute('INSERT INTO total_lb VALUES(' + ign + ', ' + date + ', 1)')
+            conn.execute('INSERT INTO total_lb VALUES(' + ign + ', ' + cty + ', ' + date + ', 1)')
         else:
             cur = conn.execute('SELECT amt FROM total_lb WHERE player = ' + ign)
             for row in cur:
                 x = row[0] + 1
             conn.execute('UPDATE total_lb SET amt = ' + str(x) + ' WHERE player = ' + ign)
-        conn.execute('INSERT INTO current_lb VALUES(' + ign + ')')
+        conn.execute('INSERT INTO current_lb VALUES(' + ign + ', ' + cty + ')')
     conn.commit()
     conn.close()

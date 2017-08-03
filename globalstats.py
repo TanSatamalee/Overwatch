@@ -2,6 +2,8 @@ import playerstats as ps
 import json
 import urllib
 import time
+import sqlite3
+import pandas as pd
 from bs4 import BeautifulSoup
 
 heros = {
@@ -68,7 +70,7 @@ def _get_leaderboard(url):
         str_response = response.read().decode('utf-8')
         data = json.loads(str_response)
         for item in data.get('entries',[]):
-            players.append(item.split('href')[1].split('\"')[1].split('/')[-1])
+            players.append((item.split('href')[1].split('\"')[1].split('/')[-1], item.split('href')[1].split('\"')[1].split('/')[-2]))
 
     return players
 
@@ -233,3 +235,22 @@ def get_global_stats(location, mode):
         total.append(temp)
 
     return total
+
+
+# Reads one of the top500 player databases and extracts all heros stats in a dictionary.
+def get_top500_heros(location, table, hero=None):
+    if not (table == 'current_lb' or table == 'total_lb'):
+        print('Table name non existant or not entered correctly.')
+        return None
+    db = 'top500/' + location + '_'
+    if not hero is None:
+        db += hero + '_'
+    db += 'leaderboard.db'
+    conn = sqlite3.connect(db)
+
+    old_arr = pd.read_sql_query('SELECT * FROM ' + table, conn)
+    stat_dict = dict()
+    for player in old_arr['player']:
+        stat_dict[ps._convert_string(player)] = ps.get_hero_stats(player, 'comp')
+
+    return stat_dict
