@@ -58,7 +58,7 @@ def _get_leaderboard(url):
 
     players = []
     for p in links:
-        players.append(p['href'].split('/')[-1])
+        players.append((p['href'].split('/')[-1], p['href'].split('/')[-2]))
 
     # Getting the other 450 players by JSON.
     json_url = 'https://masteroverwatch.com/leaderboards/pc/global/mode/'
@@ -219,7 +219,6 @@ def get_global_stats(location, mode):
     label = ['hero','popularity','winrate','kda','medals',\
         'elims','deaths','damage','block','heal','accuracy',\
         'obj_time','obj_kills','cards']
-    total.append(label)
     for i in range(min(len(overview[0]),len(overview[1]))):
         temp = []
         for a in overview:
@@ -232,10 +231,10 @@ def get_global_stats(location, mode):
         for c in misc[1:]:
             if not c == misc[3]:
                 temp.append(_convert(c[i]))
-        total.append(temp)
+        total.append(pd.DataFrame([temp], columns=label))
 
     return total
-
+print(get_global_stats('global', 'qp'))
 
 # Reads one of the top500 player databases and extracts all heros stats in a dictionary.
 def get_top500_heros(location, table, hero=None):
@@ -250,7 +249,13 @@ def get_top500_heros(location, table, hero=None):
 
     old_arr = pd.read_sql_query('SELECT * FROM ' + table, conn)
     stat_dict = dict()
-    for player in old_arr['player']:
-        stat_dict[ps._convert_string(player)] = ps.get_hero_stats(player, 'comp')
+    for i, row in old_arr.iterrows():
+        p = row['player']
+        s = ps.get_hero_stats(p, 'comp', row['region'])
+        if s is None:
+            continue
+        stat_dict[ps._convert_string(p)] = s
 
     return stat_dict
+#ans = get_top500_heros('global','current_lb','mercy')
+#print(len(ans))

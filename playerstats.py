@@ -1,9 +1,10 @@
 import requests
 import locale
 import re
+import pandas as pd
 from bs4 import BeautifulSoup
 
-url = 'https://playoverwatch.com/en-us/career/pc/us/'
+url = 'https://playoverwatch.com/en-us/career/pc/'
 
 my_ign = 'tannooby-11963'
 
@@ -21,8 +22,11 @@ def _request_page(site_url):
 
 # Returns BeautifulSoup object given a player's name.
 # Player: username-battlenetid
-def _create_soup(player):
-    page = _request_page(url + player)
+def _create_soup(player, location=None):
+    if location is None:
+        page = _request_page(url + 'us/' + player)
+    else:
+        page = _request_page(url + location + '/' + player)
     return BeautifulSoup(page.content, 'html.parser')
 
 
@@ -51,7 +55,6 @@ def get_overall_stats_value(player, mode):
 
     return stats
 
-
 # Returns the label for the overall stats of a player.
 def get_overall_stats_label():
     soup = _create_soup(my_ign)
@@ -68,14 +71,14 @@ def get_overall_stats_label():
 def get_overall_stats(player, mode):
     all_label = get_overall_stats_label()
     all_stat = get_overall_stats_value(player, mode)
-    return [all_label, all_stat]
+    return pd.DataFrame(all_stat, columns=all_label)
 
 
 # Returns the player stats for specific heros in an array form.
 # Return format: array of dictionaries with keys being string name of stat
 #    and value being string of the stat value.
-def get_hero_stats(player, mode):
-    soup = _create_soup(player)
+def get_hero_stats(player, mode, location=None):
+    soup = _create_soup(player, location)
 
     # Find the page for the game mode.
     page = None
@@ -89,6 +92,9 @@ def get_hero_stats(player, mode):
 
     stats_array = []
     hero_list = None
+    if page is None:
+        print('Could not find page for: ' + _convert_string(player))
+        return None
     for c in page.find_all():
         if 'data-group-id' in c.attrs and c['data-group-id'] == 'stats':
             if hero_list is None:
@@ -102,12 +108,13 @@ def get_hero_stats(player, mode):
                         stats_dict['hero'] = _convert_string(hero.get_text())
                 n = 0
                 while n < len(stats):
-                    stats_dict[_convert_string(stats[n].contents[0])] = _convert_string(stats[n + 1].contents[0])
+                    stats_dict[_convert_string(stats[n].contents[0])] = [int(_convert_string(stats[n + 1].contents[0])), ]
                     n = n + 2
                 if stats_dict:
-                    stats_array.append(stats_dict)
+                    stats_array.append(pd.DataFrame(stats_dict))
     
     return stats_array
+
 
 qp_hero = None
 cp_hero = None
