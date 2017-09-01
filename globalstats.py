@@ -35,6 +35,7 @@ heros = {
     'doomfist':'26'
 }
 
+
 # Returns the top 500 players for a certain region (certain hero if provided).
 # Locations: global, us, eu, kr, cn
 def get_top500(location, hero=None):
@@ -47,7 +48,8 @@ def get_top500(location, hero=None):
             return None
         url = 'https://masteroverwatch.com/leaderboards/pc/' + location + \
          '/hero/' + n + '/mode/ranked/category/averagescore'
-    return _get_leaderboard(url)
+    return pd.DataFrame(_get_leaderboard(url), columns=['name','region'])
+
 
 # Returns a list of the leaderboard with their id according to the url.
 def _get_leaderboard(url):
@@ -73,11 +75,13 @@ def _get_leaderboard(url):
             players.append((item.split('href')[1].split('\"')[1].split('/')[-1], item.split('href')[1].split('\"')[1].split('/')[-2]))
 
     return players
+print(get_top500('global'))
 
 # Returns the hero dictionary for corresponding number on masteroverwatch.com
 def _get_hero_dict():
     global heros
     return heros
+
 
 # Returns the overview stats of all heroes for a specified mode.
 # Stats: Popularity, Winrate, KDA, Medals
@@ -115,6 +119,7 @@ def get_hero_overview(location, mode):
     result = [hero_name, popularity, winrate, kda, medals]
 
     return result
+
 
 # Returns the combat stats of all heroes for a specified mode.
 # Stats: elims, deaths, damage, block, heals, accuracy
@@ -234,7 +239,7 @@ def get_global_stats(location, mode):
         total.append(pd.DataFrame([temp], columns=label))
 
     return total
-print(get_global_stats('global', 'qp'))
+
 
 # Reads one of the top500 player databases and extracts all heros stats in a dictionary.
 def get_top500_heros(location, table, hero=None):

@@ -15,6 +15,7 @@ def _convert_string(s):
         return re.sub('[^0-9]+', '', s)
     return re.sub('[^0-9a-zA-Z]+', '', s)
 
+
 # Returns the page request from url.
 def _request_page(site_url):
     return requests.get(site_url)
@@ -54,6 +55,7 @@ def get_overall_stats_value(player, mode):
         return None
 
     return stats
+
 
 # Returns the label for the overall stats of a player.
 def get_overall_stats_label():
