@@ -237,10 +237,11 @@ def get_global_stats(location, mode):
                 temp.append(_convert(c[i]))
         total.append(pd.DataFrame([temp], columns=label))
 
-
+    if total == []:
+        return None
     return pd.concat(total)
 
-
+'''
 # Reads one of the top500 player databases and extracts all heros stats in a dictionary.
 def get_top500_heros(location, table, hero=None):
     if not (table == 'current_lb' or table == 'total_lb'):
@@ -264,3 +265,4 @@ def get_top500_heros(location, table, hero=None):
     return stat_dict
 #ans = get_top500_heros('global','current_lb','mercy')
 #print(len(ans))
+'''

@@ -40,6 +40,8 @@ def _add_date(data):
 def store_global_stats(location, mode, filename, table):
     date = _get_date()
     data = gs.get_global_stats(location, mode)
+    if data is None:
+        return
     data = _add_date(data)
     utils.write_db(data, filename, table)
 
@@ -48,6 +50,8 @@ def store_global_stats(location, mode, filename, table):
 def store_player_stats(player, mode, filename):
     date = _get_date()
     data = ps.get_hero_stats(player, mode)
+    if data is None:
+        return
     for d in data:
         hero = d['hero'][0]
         d = _add_date(d)
@@ -58,9 +62,9 @@ def store_player_stats(player, mode, filename):
 def store_leaderboard(location, hero, filename):
     date = _get_date()
     lb = gs.get_top500(location, hero)
+    if lb is None:
+        return
 
     utils.write_db(lb, filename, 'current_lb')
     
     utils.write_db_count(lb, filename, 'total_lb')
-
-store_leaderboard('global', None, 'hello')

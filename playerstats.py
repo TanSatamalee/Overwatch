@@ -66,6 +66,7 @@ def get_overall_stats_label():
         stats.append(fs.get_text())
     return stats[:int(len(stats) / 2)]
 
+### =====================================================================
 
 # Returns the overall player stats for a specific mode.
 # Player: username-battlenetid
@@ -116,17 +117,3 @@ def get_hero_stats(player, mode, location=None):
                     stats_array.append(pd.DataFrame(stats_dict))
     
     return stats_array
-
-
-qp_hero = None
-cp_hero = None
-qp_over = None
-cp_over = None
-
-# Creates the dictionaries for the character stats.
-def get_all_stats(player):
-    global qp_hero, cp_hero, qp_over, cp_over
-    qp_hero = get_hero_stats(player, 'qp')
-    cp_hero = get_hero_stats(player, 'comp')
-    qp_over = get_overall_stats(player, 'qp')
-    cp_over = get_overall_stats(player, 'comp')

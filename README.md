@@ -1,60 +1,50 @@
-# Overwatch API
+# Overwatch Webscraper and Logger
 
-An attempt at creating an easy way for obtaining any kind of information on Overwatch from known sources.
+Easy to use webscraper that gets info from *playoverwatch.com* and *masteroverwatch.com* and returns 'pandas' arrays of data. Also has a logger to store info using SQLite.
 
-## playerstats.py
+## `playerstats.py`
 
 Gets data for specific players from *playoverwatch.com*.
 
 `get_overall_stats(player, mode)`
 
 Gets the overall stats for a player in a specific mode.
-Arguments: player (username-battlenetid) && mode (qp, comp)
-Return: 2D array of value labels and values for a player. First row is the labels and second row is values. ** ALL VALUES ARE IN STRING **
 
 `get_hero_stats(player, mode)`
 
 Gets the overall stats for each hero for a specific player.
-Arguments: player (username-battlenetid) && mode (qp, comp)
-Return: 2D array of dictonaries of stats for each hero. ** ALL VALUES ARE IN STRING **
 
 
-## globalstats.py
+
+## `globalstats.py`
 
 Gets global data for heroes, leaderboards, etc. from *masteroverwatch.com*
 
-`get_leaderboard()`
+`get_top500(location, hero)`
 
-Gets a list of all top 500 players with their battlenet ids. (NOTE THAT THIS OPENS A CHROME BROWSER AND GOING TO MASTEROVERWATCH)
-Arguments: none
-Return: array of 500 strings of username and battlenet ids of the current top 500 players ** STILL NEED TO DEBUG UNCONVENTIONAL NAMES **
+Gets a list of top 500 players with their battlenet ids (can also get top 500 for a specific hero). Hero is `None` if general top 500 is wanted.
 
-`get_hero_overview(location, mode)`
+`get_global_stats(location, mode)`
 
-Gets the overall stats for heroes.
-Arguments: location (global, us, eu, kr, cn) && mode (qp, comp)
-Return: 2D array of hero name, popularity, winrate, KDA, and medals for all heroes
-
-`get_hero_combat(location, mode)`
-
-Gets the combat stats for heroes.
-Arguments: location (global, us, eu, kr, cn) && mode (qp, comp)
-Return: 2D array of hero name, elims, deaths, damage, block, heals, and accuracy for all heroes
-
-`get_hero_misc(location, mode)`
-
-Gets the combat stats for heroes.
-Arguments: location (global, us, eu, kr, cn) && mode (qp, comp)
-Return: 2D array of hero name, obj time, obj kills, medals, and cards for all heroes
-
-'get_global_stats(location, mode)'
-Gets the all stats for heroes.
-Arguments: location (global, us, eu, kr, cn) && mode (qp, comp)
-Return: 2D array of all hero stats. First row is all the labels for the column values. The following rows start with the hero name and then the values for the corrsponding stats.
+Gets the data for all heros in a particular region.
 
 
-## logstats.py
 
-'store_global_stats()'
-Stores the global stats in a sqlite file for each region and game mode.
-Return: Creates a database for each region and game mode.
+## `logger.py`
+
+`store_global_stats(location, mode, filename, table)`
+
+Logs the global stats for a particular location and mode at the given filename and table.
+
+`store_player_stats(player, mode, filename)`
+
+Logs the player stats for a given battlenet id at the given filename where the table name are the heros.
+
+`store_leaderboard(location, hero, filename)`
+
+Logs the leaderboard (top 500) for a locatin at a given filename. If a hero is given, then the top 500 players of that hero will be stored instead.
+
+
+### Example
+
+An example script is given in `scraper.py` and the SQLite files are in the Season(X) folders.
