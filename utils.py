@@ -24,7 +24,7 @@ def _sql_conn(db, table, con):
 # Checks database if table exists.
 def _check_table_exist(db, table, con=None):
     conn = _sql_conn(db, table, con)
-    if not conn.execute('SELECT * FROM ' + table):
+    if not conn.execute("SELECT name FROM sqlite_master WHERE type='table' and name=\'" + table + "\'").fetchone():
         return False
     return True
 
@@ -60,6 +60,7 @@ def write_db(data, db, table):
             arr = arr.drop('level_0', axis=1)
     else:
         arr = data
+    conn.execute('DROP TABLE IF EXISTS ' + table)
     arr.to_sql(table, conn)
     conn.commit()
     conn.close()
@@ -76,8 +77,11 @@ def write_db_count(data, db, table):
         if 'level_0' in arr:
             arr = arr.drop('level_0', axis=1)
         temp['count'] = arr.groupby(list(data)[:2])['count'].transform('sum')
+        conn.execute('DROP TABLE IF EXISTS ' + table)
         temp.to_sql(table, conn)
     else:
+        conn.execute('DROP TABLE IF EXISTS ' + table)
+        data['count'] = 1
         data.to_sql(table, conn)
     conn.commit()
     conn.close()

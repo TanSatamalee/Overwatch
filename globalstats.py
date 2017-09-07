@@ -75,7 +75,6 @@ def _get_leaderboard(url):
             players.append((item.split('href')[1].split('\"')[1].split('/')[-1], item.split('href')[1].split('\"')[1].split('/')[-2]))
 
     return players
-print(get_top500('global'))
 
 # Returns the hero dictionary for corresponding number on masteroverwatch.com
 def _get_hero_dict():
@@ -238,7 +237,8 @@ def get_global_stats(location, mode):
                 temp.append(_convert(c[i]))
         total.append(pd.DataFrame([temp], columns=label))
 
-    return total
+
+    return pd.concat(total)
 
 
 # Reads one of the top500 player databases and extracts all heros stats in a dictionary.
