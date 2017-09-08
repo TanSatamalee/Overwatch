@@ -4,6 +4,8 @@ import urllib
 import time
 import sqlite3
 import pandas as pd
+import gzip
+from io import BytesIO
 from bs4 import BeautifulSoup
 
 heros = {
@@ -241,28 +243,67 @@ def get_global_stats(location, mode):
         return None
     return pd.concat(total)
 
-'''
-# Reads one of the top500 player databases and extracts all heros stats in a dictionary.
-def get_top500_heros(location, table, hero=None):
-    if not (table == 'current_lb' or table == 'total_lb'):
-        print('Table name non existant or not entered correctly.')
+
+# UNUSABLE UNTIL FIGURE OUT HOW TO DECODE STRING FROM GZIP FILE
+# A more specific version of get_global_stats() taken from overbuff.com
+# Allows for specification of time length[time] (1w, 1m, 3m, 6m),
+# console[con] (pc, psn, xbl), role[role] (all, off, def, tank, supp),
+# and skill rate[sr] (all, bronze, silver, gold, plat, diamond, master, gm).
+def get_gloal_stats2(mode, time, con, role, sr):
+    # Adds the time to request URL.
+    if not (time == '1w' or time == '1m' or time == '3m' or time == '6m'):
+        print('Time Error')
         return None
-    db = 'top500/' + location + '_'
-    if not hero is None:
-        db += hero + '_'
-    db += 'leaderboard.db'
-    conn = sqlite3.connect(db)
+    url = 'https://www.overbuff.com/tank/heroes?v=2293d4f&time=' + time + '&platform='
 
-    old_arr = pd.read_sql_query('SELECT * FROM ' + table, conn)
-    stat_dict = dict()
-    for i, row in old_arr.iterrows():
-        p = row['player']
-        s = ps.get_hero_stats(p, 'comp', row['region'])
-        if s is None:
-            continue
-        stat_dict[ps._convert_string(p)] = s
+    # Adds console to request URL.
+    con_list = {'pc':'1', 'psn':'2', 'xbl':'3'}
+    if con in con_list:
+        url += con_list[con]
+    else:
+        print('Console Error')
+        return None
 
-    return stat_dict
-#ans = get_top500_heros('global','current_lb','mercy')
-#print(len(ans))
-'''
+    # Adds game mode to request URL
+    url += '&game_mode='
+    mode_list = {'qp':'1', 'comp':'2'}
+    if mode in mode_list:
+        url += mode_list[mode]
+    else:
+        print('Mode Error')
+        return None
+
+    # Adds hero role to request URL
+    url += '&group_hero=true'
+    role_list = {'all':'', 'off':'&role=1', 'def':'&role=2', 'tank':'&role3', 'supp':'&role4'}
+    if role in role_list:
+        url += role_list[role]
+    else:
+        print('Role Error')
+        return None
+
+    # Adds skill rating to request URL
+    sr_list = {
+        'all':'',
+        'bronze':'1',
+        'silver':'2',
+        'gold':'3',
+        'plat':'4',
+        'diamond':'5',
+        'master':'6',
+        'gm':'7',
+    }
+    if sr in sr_list:
+        url += '&skill_tier' + sr_list[sr]
+    else:
+        print('SR Error')
+        return None
+
+    # Request URL and reads string and decodes
+    hdr = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0', 'Accept-Encoding': 'gzip,deflate,br'}
+    req = urllib.request.Request(url, headers=hdr)
+    response = urllib.request.urlopen(req)
+    buf = BytesIO(response.read())
+    gzipFile = gzip.GzipFile(fileobj=buf)
+    data = gzipFile.read().decode('utf-8')
+    print(data) # Random letters. Looks encrypted.

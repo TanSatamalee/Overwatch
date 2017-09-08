@@ -91,7 +91,10 @@ def write_db_count(data, db, table):
 def read_db(db, table):
     db = _check_db_name(db)
     conn = sqlite3.connect(db)
-    arr = pd.read_sql_query('SELECT * FROM ' + table, conn)
+    if _check_table_exist(db, table, conn):
+        arr = pd.read_sql_query('SELECT * FROM ' + table, conn)
+    else:
+        print('Table does not exist.')
     conn.close()
     return arr
 

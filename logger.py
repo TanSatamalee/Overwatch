@@ -47,7 +47,7 @@ def store_global_stats(location, mode, filename, table):
 
 
 # Stores each hero stats for an individual player
-def store_player_stats(player, mode, filename):
+def store_player_stats(player, location, mode, filename):
     date = _get_date()
     data = ps.get_hero_stats(player, mode)
     if data is None:
@@ -56,6 +56,20 @@ def store_player_stats(player, mode, filename):
         hero = d['hero'][0]
         d = _add_date(d)
         utils.write_db(d, filename, hero)
+
+
+# Stores specific hero stats for an individual player
+def store_player_hero_stats(player, location, hero, mode, filename, table):
+    date = _get_date()
+    data = ps.get_hero_stats(player, mode)
+    if data is None:
+        return
+    for d in data:
+        h = d['hero'][0]
+        if h == hero:
+            d = _add_date(d)
+            utils.write_db(d, filename, table)
+            break
 
 
 # Stores the leaderboard for a given location and hero (if specified)
@@ -68,3 +82,8 @@ def store_leaderboard(location, hero, filename):
     utils.write_db(lb, filename, 'current_lb')
     
     utils.write_db_count(lb, filename, 'total_lb')
+
+
+# Reads a pandas array from a given filename and table
+def read_database(filename, table):
+    return utils.read_db(filename, table)
