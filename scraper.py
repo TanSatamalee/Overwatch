@@ -26,9 +26,9 @@ for l in locations:
 
 time_elapsed()
 
-
+'''
 # For leaderboards only keeps track for global and us (including each hero)
-for l in locations[:1]:
+for l in locations[:2]:
 	logger.store_leaderboard(l, None, season + '/lb_' + l)
 	for h in heros:
 		logger.store_leaderboard(l, h, season + '/lb_' + l + '_' + h)
@@ -37,10 +37,8 @@ time_elapsed()
 
 
 # Keeps track of all top 500 stats for a specific hero.
-for l in locations[:1]:
+for l in locations[:2]:
 	for h in heros:
-		print(l)
-		print(h)
 		# Gets all who have made top 500 this season
 		lb = logger.read_database(season + '/lb_' + l + '_' + h, 'total_lb')
 		for index, row in lb.iterrows():
@@ -51,3 +49,4 @@ for l in locations[:1]:
 				break
 		break
 	break
+'''

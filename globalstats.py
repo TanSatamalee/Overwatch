@@ -300,10 +300,12 @@ def get_gloal_stats2(mode, time, con, role, sr):
         return None
 
     # Request URL and reads string and decodes
-    hdr = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0', 'Accept-Encoding': 'gzip,deflate,br'}
+    hdr = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0', 'Accept-Encoding': 'gzip'}
     req = urllib.request.Request(url, headers=hdr)
     response = urllib.request.urlopen(req)
     buf = BytesIO(response.read())
-    gzipFile = gzip.GzipFile(fileobj=buf)
+    gzipFile = gzip.GzipFile(fileobj=buf, mode='r')
     data = gzipFile.read().decode('utf-8')
-    print(data) # Random letters. Looks encrypted.
+    print(data)
+
+#get_gloal_stats2('qp', '1w', 'pc', 'all', 'all')
